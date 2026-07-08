@@ -136,8 +136,8 @@ export default function RegisterCafePage() {
     : Promise.resolve({ error: null }),
 ]);
 
-const failed = results.find((r) => r?.error);
-if (failed) {
+const failed = results.find((r) => r.error);
+if (failed?.error) {
   setError(`Sebagian data gagal disimpan: ${failed.error.message}`);
   setLoading(false);
   return;
