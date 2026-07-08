@@ -570,6 +570,29 @@ CREATE POLICY "Pemilik mendaftarkan cafe baru" ON cafes FOR INSERT
     TO authenticated
     WITH CHECK (owner_id IN (SELECT id FROM users WHERE auth_user_id = auth.uid() AND role = 'pemilik_kafe'));
 CREATE POLICY "Pemilik memperbarui data cafe sendiri" ON cafes FOR UPDATE
+CREATE POLICY "Pemilik menambah meja di cafenya" ON tables FOR INSERT
+    TO authenticated
+    WITH CHECK (cafe_id IN (
+        SELECT id FROM cafes WHERE owner_id IN (SELECT id FROM users WHERE auth_user_id = auth.uid())
+    ));
+
+CREATE POLICY "Pemilik menambah menu di cafenya" ON menus FOR INSERT
+    TO authenticated
+    WITH CHECK (cafe_id IN (
+        SELECT id FROM cafes WHERE owner_id IN (SELECT id FROM users WHERE auth_user_id = auth.uid())
+    ));
+
+CREATE POLICY "Pemilik menambah jam operasional cafenya" ON operating_hours FOR INSERT
+    TO authenticated
+    WITH CHECK (cafe_id IN (
+        SELECT id FROM cafes WHERE owner_id IN (SELECT id FROM users WHERE auth_user_id = auth.uid())
+    ));
+
+CREATE POLICY "Pemilik menambah fasilitas cafenya" ON cafe_facilities FOR INSERT
+    TO authenticated
+    WITH CHECK (cafe_id IN (
+        SELECT id FROM cafes WHERE owner_id IN (SELECT id FROM users WHERE auth_user_id = auth.uid())
+    )); 
     USING (owner_id IN (SELECT id FROM users WHERE auth_user_id = auth.uid()))
     WITH CHECK (owner_id IN (SELECT id FROM users WHERE auth_user_id = auth.uid()));
 
