@@ -63,7 +63,7 @@ export default async function HomePage() {
     <div>
       <section className="mb-8">
         <h1 className="font-display text-3xl font-semibold text-ink sm:text-4xl">
-          Temukan meja kafe yang pas, tanpa datang lalu kecewa
+          Secure Your Spot, Ignite Your Productivity
         </h1>
         <p className="mt-2 max-w-2xl text-ink/70">
           Lihat ketersediaan meja secara langsung, pesan dari mana saja, dan
