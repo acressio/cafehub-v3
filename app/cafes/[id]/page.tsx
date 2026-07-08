@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { MapPin, Clock, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import BookingForm from "@/components/BookingForm";
+import ReviewForm from "@/components/ReviewForm";
 
 export const revalidate = 0;
 
@@ -141,6 +142,13 @@ export default async function CafeDetailPage({
 
         <div className="mt-8">
           <h2 className="font-display text-lg font-semibold text-ink">Ulasan</h2>
+          <div className="mt-8">
+          <h2 className="font-display text-lg font-semibold text-ink">Ulasan</h2>
+
+          <div className="my-4">
+            <ReviewForm cafeId={cafeId} isLoggedIn={!!auth?.user} />
+          </div>
+
           {(reviews ?? []).length === 0 ? (
             <p className="mt-2 text-sm text-muted">Belum ada ulasan untuk kafe ini.</p>
           ) : (
