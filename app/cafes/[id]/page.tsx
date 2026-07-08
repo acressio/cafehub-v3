@@ -142,8 +142,6 @@ export default async function CafeDetailPage({
 
         <div className="mt-8">
           <h2 className="font-display text-lg font-semibold text-ink">Ulasan</h2>
-          <div className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-ink">Ulasan</h2>
 
           <div className="my-4">
             <ReviewForm cafeId={cafeId} isLoggedIn={!!auth?.user} />
