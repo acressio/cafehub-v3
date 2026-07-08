@@ -103,40 +103,47 @@ export default function RegisterCafePage() {
       return;
     }
 
-    await Promise.all([
-      supabase.from("tables").insert(
-        tables.map((t) => ({
-          cafe_id: cafe.id,
-          nomor_meja: t.nomor_meja,
-          kapasitas: Number(t.kapasitas),
-        }))
-      ),
-      supabase.from("operating_hours").insert({
-        cafe_id: cafe.id,
-        hari: "Senin-Minggu",
-        jam_buka: jamBuka,
-        jam_tutup: jamTutup,
-      }),
-      menus.some((m) => m.nama_menu)
-        ? supabase.from("menus").insert(
-            menus
-              .filter((m) => m.nama_menu)
-              .map((m) => ({
-                cafe_id: cafe.id,
-                nama_menu: m.nama_menu,
-                harga: Number(m.harga || 0),
-                kategori: m.kategori,
-              }))
-          )
-        : Promise.resolve(),
-      selectedFacilities.length > 0
-        ? supabase
-            .from("cafe_facilities")
-            .insert(selectedFacilities.map((facility_id) => ({ cafe_id: cafe.id, facility_id })))
-        : Promise.resolve(),
-    ]);
+    const results = await Promise.all([
+  supabase.from("tables").insert(
+    tables.map((t) => ({
+      cafe_id: cafe.id,
+      nomor_meja: t.nomor_meja,
+      kapasitas: Number(t.kapasitas),
+    }))
+  ),
+  supabase.from("operating_hours").insert({
+    cafe_id: cafe.id,
+    hari: "Senin-Minggu",
+    jam_buka: jamBuka,
+    jam_tutup: jamTutup,
+  }),
+  menus.some((m) => m.nama_menu)
+    ? supabase.from("menus").insert(
+        menus
+          .filter((m) => m.nama_menu)
+          .map((m) => ({
+            cafe_id: cafe.id,
+            nama_menu: m.nama_menu,
+            harga: Number(m.harga || 0),
+            kategori: m.kategori,
+          }))
+      )
+    : Promise.resolve({ error: null }),
+  selectedFacilities.length > 0
+    ? supabase
+        .from("cafe_facilities")
+        .insert(selectedFacilities.map((facility_id) => ({ cafe_id: cafe.id, facility_id })))
+    : Promise.resolve({ error: null }),
+]);
 
-    router.push("/owner");
+const failed = results.find((r) => r?.error);
+if (failed) {
+  setError(`Sebagian data gagal disimpan: ${failed.error.message}`);
+  setLoading(false);
+  return;
+}
+
+router.push("/owner");
   }
 
   return (
