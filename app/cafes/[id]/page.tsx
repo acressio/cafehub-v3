@@ -43,7 +43,6 @@ export default async function CafeDetailPage({
       .from("reviews")
       .select("*, users(nama)")
       .eq("cafe_id", cafeId)
-      .eq("status_moderasi", "approved")
       .order("created_at", { ascending: false }),
     supabase.auth.getUser(),
   ]);
