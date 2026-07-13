@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
@@ -18,11 +17,18 @@ interface CafeRow {
   users: { nama: string; email: string } | null;
 }
 
+interface ApprovedCafeRow {
+  id: number;
+  nama: string;
+  subscription_tier: string;
+}
+
 export default function AdminDashboardPage() {
   const supabase = createClient();
   const router = useRouter();
   const [adminId, setAdminId] = useState<number | null>(null);
   const [cafes, setCafes] = useState<CafeRow[]>([]);
+  const [approvedCafes, setApprovedCafes] = useState<ApprovedCafeRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [note, setNote] = useState<Record<number, string>>({});
@@ -51,6 +57,14 @@ export default function AdminDashboardPage() {
       .eq("status", "pending_verification")
       .order("created_at", { ascending: true });
     setCafes((data as any) ?? []);
+
+    const { data: approved } = await supabase
+      .from("cafes")
+      .select("id, nama, subscription_tier")
+      .eq("status", "approved")
+      .order("nama");
+    setApprovedCafes((approved as any) ?? []);
+
     setLoading(false);
   }
 
@@ -72,15 +86,19 @@ export default function AdminDashboardPage() {
     setBusyId(null);
   }
 
+  async function updateTier(cafeId: number, tier: string) {
+    await supabase.from("cafes").update({ subscription_tier: tier }).eq("id", cafeId);
+    setApprovedCafes((prev) =>
+      prev.map((c) => (c.id === cafeId ? { ...c, subscription_tier: tier } : c))
+    );
+  }
+
   if (loading) return <p className="text-sm text-muted">Memuat dasbor admin...</p>;
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl font-semibold text-ink">Verifikasi kafe</h1>
-        <Link href="/admin/moderation" className="text-sm text-ink underline">
-          Moderasi ulasan &rarr;
-        </Link>
       </div>
 
       {cafes.length === 0 ? (
@@ -125,6 +143,32 @@ export default function AdminDashboardPage() {
                   Tolak
                 </Button>
               </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <h2 className="mb-3 mt-10 font-display text-lg font-semibold text-ink">
+        Paket langganan kafe
+      </h2>
+      {approvedCafes.length === 0 ? (
+        <p className="text-sm text-muted">Belum ada kafe yang disetujui.</p>
+      ) : (
+        <div className="space-y-2">
+          {approvedCafes.map((c) => (
+            <div
+              key={c.id}
+              className="flex items-center justify-between rounded-card border border-line bg-surface p-4"
+            >
+              <p className="font-medium text-ink">{c.nama}</p>
+              <select
+                value={c.subscription_tier}
+                onChange={(e) => updateTier(c.id, e.target.value)}
+                className="rounded-full border border-line bg-parchment px-3 py-1.5 text-sm"
+              >
+                <option value="standar">Standar</option>
+                <option value="premium">Premium</option>
+              </select>
             </div>
           ))}
         </div>
