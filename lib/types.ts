@@ -23,7 +23,6 @@ export type NotificationTipe =
   | "completed"
   | "payment"
   | "verification";
-export type ModerasiStatus = "approved" | "pending" | "rejected";
 export type VerificationKeputusan = "approved" | "rejected";
 
 export interface AppUser {
@@ -92,8 +91,6 @@ export interface Review {
   cafe_id: number;
   rating: number;
   komentar: string | null;
-  status_moderasi: ModerasiStatus;
-  dilaporkan: boolean;
   created_at: string;
 }
 
@@ -113,7 +110,6 @@ export interface Notification {
   id: number;
   user_id: number;
   tipe: NotificationTipe;
-  channel: "in_app" | "email" | "whatsapp";
   judul: string;
   pesan: string;
   is_read: boolean;
